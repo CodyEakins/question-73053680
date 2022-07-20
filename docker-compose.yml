@@ -1,0 +1,37 @@
+version: '3.9'
+services:
+  mysql:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_DATABASE: 'admindb'
+      MYSQL_USER: 'admin'
+      MYSQL_PASSWORD: 'secretpassword'
+      MYSQL_ROOT_PASSWORD: 'someverysecretpassword'
+    ports:
+      - '3306:3306'
+      - '33060:33060'
+    volumes:
+      - ./db:/var/lib/mysql
+    networks:
+      - adminnet
+  app:
+    image: "node:latest"
+    depends_on:
+      - mysql
+    user: "node"
+    working_dir: /home/app
+    environment:
+      NODE_ENV: production
+    volumes:
+      - ./:/home/app
+    ports:
+      - '8081:8081'
+    command: "npm start"
+    networks:
+      - adminnet
+volumes:
+  db:
+  data:
+networks:
+  adminnet:
